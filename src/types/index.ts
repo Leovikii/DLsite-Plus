@@ -8,8 +8,6 @@ export interface DLSiteWork {
     update_date?: string;
     dl_count?: number;
     age_rating?: string;
-    scenario?: string[];
-    illustration?: string[];
     music?: string[];
     file_size?: string;
     isGirls?: boolean;
@@ -25,8 +23,6 @@ export interface WorkInfo {
     update?: string;
     rating?: string;
     tags?: { text: string; class?: string; onClick?: () => void }[];
-    scenario?: string;
-    illustration?: string;
     cv?: string;
     music?: string;
     filesize?: string;

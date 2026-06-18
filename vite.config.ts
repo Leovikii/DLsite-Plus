@@ -19,18 +19,10 @@ export default defineConfig({
           'zh-CN': '在南+论坛提取RJ号，自动获取并显示DLSite作品信息。'
         },
         match: [
-          '*://*.south-plus.net/read.php*',
-          '*://*.south-plus.net/thread.php*',
-          '*://*.south-plus.net/thread_new.php*',
-          '*://*.spring-plus.net/read.php*',
-          '*://*.spring-plus.net/thread.php*',
-          '*://*.spring-plus.net/thread_new.php*',
-          '*://*.level-plus.net/read.php*',
-          '*://*.level-plus.net/thread.php*',
-          '*://*.level-plus.net/thread_new.php*',
-          '*://*.imoutolove.me/read.php*',
-          '*://*.imoutolove.me/thread.php*',
-          '*://*.imoutolove.me/thread_new.php*'
+          '*://*.south-plus.net/*',
+          '*://*.spring-plus.net/*',
+          '*://*.level-plus.net/*',
+          '*://*.imoutolove.me/*'
         ],
         version: '1.0.0',
         connect: [

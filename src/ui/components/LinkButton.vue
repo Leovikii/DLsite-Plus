@@ -1,21 +1,12 @@
 <template>
   <a 
     class="dlsite-plus-link-btn"
-    :class="`theme-${theme}`"
-    :href="href"
-    target="_blank" 
+    :class="[`theme-${theme}`, { 'is-disabled': disabled }]"
+    :href="disabled ? undefined : href"
+    :target="disabled ? undefined : '_blank'" 
     rel="noreferrer"
   >
-    <!-- Left: External Link Icon -->
-    <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-      <polyline points="15 3 21 3 21 9"></polyline>
-      <line x1="10" y1="14" x2="21" y2="3"></line>
-    </svg>
-
-    <div class="divider"></div>
-
-    <!-- Right: Website Logo -->
+    <!-- Left: Website Logo -->
     <template v-if="theme === 'dlsite'">
       <svg class="site-logo dlsite-logo" viewBox="0 0 118.45 33.65" xmlns="http://www.w3.org/2000/svg">
         <g transform="translate(-98.55,-10.36)">
@@ -26,20 +17,34 @@
     </template>
 
     <template v-else-if="theme === 'asmrone'">
-      <svg class="site-logo asmrone-logo" viewBox="0 0 120 34" xmlns="http://www.w3.org/2000/svg">
-        <!-- Mock ASMR.one logo mirroring DLsite's structure (Text + Dot) -->
+      <svg class="site-logo asmrone-logo" viewBox="0 0 145 34" xmlns="http://www.w3.org/2000/svg">
         <text x="0" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="900" font-size="28" class="logo-text" letter-spacing="-1">ASMR</text>
         <circle cx="74" cy="22" r="3.5" class="logo-dot" />
         <text x="81" y="26" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="900" font-size="28" class="logo-text" letter-spacing="-1">one</text>
       </svg>
     </template>
+
+    <!-- Right: Action Icon -->
+    <div class="icon-wrapper">
+      <svg v-if="!disabled" class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+        <polyline points="15 3 21 3 21 9"></polyline>
+        <line x1="10" y1="14" x2="21" y2="3"></line>
+      </svg>
+      <svg v-else class="action-icon disabled-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
+      </svg>
+    </div>
   </a>
 </template>
 
 <script setup lang="ts">
 defineProps<{
-  href: string;
+  href?: string | null;
   theme: 'dlsite' | 'asmrone';
+  disabled?: boolean;
 }>();
 </script>
 
@@ -47,80 +52,92 @@ defineProps<{
 .dlsite-plus-link-btn {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   width: 100%;
-  gap: 12px;
-  border-radius: 8px;
-  padding: 12px 0;
+  border-radius: 14px;
+  padding: 10px 16px;
   text-decoration: none;
-  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  border-bottom: 4px solid rgba(0, 0, 0, 0.2);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-sizing: border-box;
+  
+  /* iOS Primary Button Style */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
-.dlsite-plus-link-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+.dlsite-plus-link-btn:not(.is-disabled):hover {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   filter: brightness(1.1);
 }
 
-.dlsite-plus-link-btn:active {
-  transform: translateY(2px);
-  border-bottom-width: 0px;
-  margin-bottom: 4px; /* compensate for lost border to keep layout stable */
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  filter: brightness(0.9);
+.dlsite-plus-link-btn:not(.is-disabled):active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  filter: brightness(0.95);
 }
 
-.external-icon {
-  height: 20px;
-  width: 20px;
-}
-
-.divider {
-  width: 1px;
+.icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
   height: 24px;
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 1px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.15); /* Soft dark inset for iOS look */
+}
+
+.action-icon {
+  height: 14px;
+  width: 14px;
+  color: #ffffff;
 }
 
 .site-logo {
-  height: 22px;
+  height: 18px;
   width: auto;
+}
+
+/* --- Disabled State --- */
+.dlsite-plus-link-btn.is-disabled {
+  background-color: rgba(255, 255, 255, 0.05);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.dlsite-plus-link-btn.is-disabled .logo-dot,
+.dlsite-plus-link-btn.is-disabled .logo-text {
+  fill: rgba(255, 255, 255, 0.2);
+}
+
+.dlsite-plus-link-btn.is-disabled .icon-wrapper {
+  background: transparent;
+}
+
+.dlsite-plus-link-btn.is-disabled .action-icon {
+  color: rgba(255, 255, 255, 0.2);
 }
 
 /* --- Theme: DLsite --- */
 .theme-dlsite {
-  background-color: #0044cc; /* DLsite vivid blue */
-}
-.theme-dlsite .external-icon {
-  color: #ffffff;
+  background-color: #0055ff;
+  background: linear-gradient(180deg, #1a75ff 0%, #0044cc 100%);
 }
 .theme-dlsite .logo-dot {
-  fill: #fbc600; /* Yellow dot */
+  fill: #facc15; /* Bright Yellow dot pops on blue */
 }
 .theme-dlsite .logo-text {
-  fill: #ffffff; /* White text */
-}
-.theme-dlsite .divider {
-  background-color: rgba(255, 255, 255, 0.2);
+  fill: #ffffff;
 }
 
 /* --- Theme: ASMR.one --- */
 .theme-asmrone {
-  background-color: #f8c300; /* ASMR.one vivid yellow */
-  border-bottom-color: #c79c00;
-}
-.theme-asmrone .external-icon {
-  color: #1e293b; /* Dark icon */
+  background-color: #39c5bb;
+  background: linear-gradient(180deg, #51d8cf 0%, #29b8ac 100%);
 }
 .theme-asmrone .logo-dot {
-  fill: #ffffff; /* White dot */
+  fill: #ffffff;
 }
 .theme-asmrone .logo-text {
-  fill: #1e293b; /* Dark text */
-}
-.theme-asmrone .divider {
-  background-color: rgba(30, 41, 59, 0.2);
+  fill: #ffffff;
 }
 </style>

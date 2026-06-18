@@ -5,14 +5,54 @@
       ref="popupRef" 
       class="dlsite-plus-popup"
       :class="[isGirls ? 'theme-girls' : 'theme-maniax']"
-      :style="positionStyle"
+      :style="[positionStyle, dynamicHeight ? { height: dynamicHeight + 'px' } : {}]"
     >
       <div class="popup-close-btn" @click="closePopup">✕</div>
 
-      <div v-if="loading" class="popup-loader">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
+      <div class="popup-inner-wrapper" ref="innerWrapperRef">
+        <div v-if="loading" class="popup-skeleton">
+        <div class="skeleton-header">
+          <div class="skeleton-eyebrow shimmer"></div>
+          <div class="skeleton-title shimmer"></div>
+          <div class="skeleton-title short shimmer"></div>
+        </div>
+        <div class="skeleton-panels">
+          <div class="skeleton-left">
+            <div class="skeleton-cover shimmer"></div>
+            <div class="skeleton-btn shimmer"></div>
+            <div class="skeleton-btn shimmer"></div>
+          </div>
+          <div class="skeleton-right">
+            <div class="skeleton-row">
+              <div class="skeleton-label shimmer"></div>
+              <div class="skeleton-text shimmer"></div>
+            </div>
+            <div class="skeleton-row">
+              <div class="skeleton-label shimmer"></div>
+              <div class="skeleton-tags">
+                <div class="skeleton-tag shimmer" style="width: 80px;"></div>
+                <div class="skeleton-tag shimmer" style="width: 120px;"></div>
+                <div class="skeleton-tag shimmer" style="width: 90px;"></div>
+                <div class="skeleton-tag shimmer" style="width: 70px;"></div>
+              </div>
+            </div>
+            <div class="skeleton-row">
+              <div class="skeleton-label shimmer"></div>
+              <div class="skeleton-tags">
+                <div class="skeleton-tag shimmer" style="width: 100px;"></div>
+                <div class="skeleton-tag shimmer" style="width: 85px;"></div>
+              </div>
+            </div>
+            <div class="skeleton-row">
+              <div class="skeleton-label shimmer"></div>
+              <div class="skeleton-tags">
+                <div class="skeleton-tag shimmer" style="width: 75px;"></div>
+                <div class="skeleton-tag shimmer" style="width: 110px;"></div>
+                <div class="skeleton-tag shimmer" style="width: 60px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div v-else-if="!workFound" class="popup-not-found">
@@ -22,21 +62,13 @@
       </div>
 
       <div v-else class="popup-content">
-        <div class="header-section">
-          <span 
-            class="header-rjcode" 
-            @click="onCopyRjCode"
-            title="点击复制 RJ 号"
-          >
-            {{ state.rjCode.toUpperCase() }}
-          </span>
-          <span 
-            class="work-title" 
-            :title="titleHint"
-            @click="onCopyTitle"
-          >
-            {{ title || 'Loading...' }}
-          </span>
+        <div class="popup-header">
+          <div class="header-main">
+            <div class="rj-eyebrow" :title="copyHint" @click.stop="onCopyRjCode">{{ state.rjCode.toUpperCase() }}</div>
+            <div class="work-title" :title="titleHint" @click="onCopyTitle">
+              {{ title || 'Loading...' }}
+            </div>
+          </div>
         </div>
 
         <div class="panel-container">
@@ -45,45 +77,54 @@
             <div class="dlsite-cover-container">
               <CoverImage :src="imgLink" />
             </div>
-            <LinkButton 
-              :href="'https://www.dlsite.com/maniax/work/=/product_id/' + state.rjCode.toUpperCase() + '.html'"
-              theme="dlsite"
-            />
-            
-            <LinkButton 
-              v-if="asmrOneUrl"
-              :href="asmrOneUrl"
-              theme="asmrone"
-              style="margin-top: 10px;"
-            />
+            <div class="buttons-container">
+              <LinkButton 
+                :href="'https://www.dlsite.com/maniax/work/=/product_id/' + state.rjCode.toUpperCase() + '.html'"
+                theme="dlsite"
+              />
+              
+              <LinkButton 
+                :href="asmrOneUrl"
+                :disabled="!asmrOneUrl"
+                theme="asmrone"
+              />
+            </div>
           </div>
 
           <!-- Right Panel: Information -->
           <div class="panel-right">
+            <div class="tags-section" v-if="circle">
+              <div class="section-title">社团</div>
+              <div class="tags-flow circle-name-text">
+                {{ circle }}
+              </div>
+            </div>
 
-          <WorkTags :tags="tags" />
+            <div class="tags-section" v-if="sales || ratingAvg > 0 || releaseDate || ageRating || workType || fileSize">
+              <div class="section-title">基础信息</div>
+              <div class="tags-flow">
+                <CapsuleTag v-if="sales" theme="sales" :text="`售出: ${sales}`" />
+                <CapsuleTag v-if="ratingAvg > 0" theme="rating" :text="`评价: ${ratingAvg.toFixed(2)}★ (${ratingCount})`" />
+                <CapsuleTag v-if="releaseDate" theme="basic" :text="releaseDate" />
+                <CapsuleTag v-if="ageRating" :theme="ageRating.includes('18') ? 'r18' : 'basic'" :text="ageRating" />
+                <CapsuleTag v-if="workType" :theme="workTypeId >= 0 ? `type-${workTypeId}` : 'basic'" :text="workType" />
+                <CapsuleTag v-if="fileSize" theme="basic" :text="fileSize" />
+              </div>
+            </div>
 
-          <div class="info-container primary-info">
-            <InfoRow 
-              v-for="row in primaryRows" 
-              :key="row.id"
-              :title="row.title"
-              :items="row.items"
-              :separator="row.separator"
-              :copyHint="copyHint"
-            />
-          </div>
+            <div class="tags-section" v-if="cv.length">
+              <div class="section-title">声优</div>
+              <div class="tags-flow">
+                <CapsuleTag v-for="actor in cv" :key="actor" theme="cv" :text="actor" />
+              </div>
+            </div>
 
-          <!-- Secondary Grid Layout -->
-          <div class="info-container secondary-info-grid">
-            <InfoRow 
-              v-for="row in secondaryRows" 
-              :key="row.id"
-              :title="row.title"
-              :items="row.items"
-              :separator="row.separator"
-              :copyHint="copyHint"
-            />
+            <div class="tags-section" v-if="genreTags.length">
+              <div class="section-title">分类</div>
+              <div class="tags-flow">
+                <CapsuleTag v-for="tag in genreTags" :key="tag" theme="genre" :text="tag" />
+              </div>
+            </div>
           </div>
         </div>
         </div>
@@ -100,24 +141,34 @@ import { localizePopup, localizationMap } from '../config/localization';
 import { VOICELINK_CLASS } from '../config/constants';
 
 import CoverImage from './components/CoverImage.vue';
-import WorkTags from './components/WorkTags.vue';
-import InfoRow from './components/InfoRow.vue';
 import LinkButton from './components/LinkButton.vue';
+import CapsuleTag from './components/CapsuleTag.vue';
 
 const props = defineProps<{
   state: PopupState;
 }>();
 
 const popupRef = ref<HTMLElement | null>(null);
+const innerWrapperRef = ref<HTMLElement | null>(null);
+const dynamicHeight = ref<number | null>(null);
+let resizeObserver: ResizeObserver | null = null;
 
 // State variables
 const workFound = ref(true);
 const loading = ref(true);
 const title = ref('');
 const imgLink = ref('');
-const tags = ref<any[]>([]);
-const primaryRows = ref<any[]>([]);
-const secondaryRows = ref<any[]>([]);
+const sales = ref<string>('');
+const ratingAvg = ref<number>(0);
+const ratingCount = ref<number>(0);
+const circle = ref<string>('');
+const releaseDate = ref<string>('');
+const cv = ref<string[]>([]);
+const ageRating = ref<string>('');
+const workType = ref<string>('');
+const workTypeId = ref<number>(-1);
+const fileSize = ref<string>('');
+const genreTags = ref<string[]>([]);
 const isGirls = ref(false);
 const asmrOneUrl = ref<string | null>(null);
 
@@ -140,9 +191,14 @@ const positionStyle = computed(() => {
       left = props.state.x - width - 15;
       if (left < 0) left = 10;
     }
-    // Very rough height bounding
-    if (top + height > window.innerHeight) {
-      top = window.innerHeight - height - 10;
+    
+    // Vertical flip (Option 1): if it might hit bottom, flip it to show ABOVE the cursor
+    const estimatedMaxHeight = 550; // Increased to account for many tags
+    if (top + estimatedMaxHeight > window.innerHeight) {
+      // Flip up above the mouse
+      top = props.state.y - estimatedMaxHeight - 15;
+      
+      // If flipping up causes it to hit the top of the screen, clamp it to top
       if (top < 0) top = 10;
     }
   }
@@ -189,19 +245,20 @@ const updatePopupData = async () => {
   workFound.value = false;
   title.value = '';
   imgLink.value = '';
-  primaryRows.value = [];
-  secondaryRows.value = [];
-  tags.value = [];
-  isGirls.value = false;
-  asmrOneUrl.value = null;
+  sales.value = '';
+  ratingAvg.value = 0;
+  ratingCount.value = 0;
+  circle.value = '';
+  releaseDate.value = '';
+  cv.value = [];
+  ageRating.value = '';
+  workType.value = '';
+  workTypeId.value = -1;
+  fileSize.value = '';
+  genreTags.value = [];
 
   try {
     let found = await WorkPromise.getFound(rjCode);
-    if (!found) {
-      // Logic for fallback is in linkage.ts (to be refactored) but for now we'll call getParentRJ
-      // Wait, currently scraper.ts is not fully rewritten.
-      // I'll keep the logic using the current WorkPromise structure.
-    }
     workFound.value = found;
     if (!found) {
       loading.value = false;
@@ -219,87 +276,22 @@ const updatePopupData = async () => {
     }),
     WorkPromise.getGirls(rjCode).then(g => { if (rjCode === props.state.rjCode) isGirls.value = !!g; }),
     WorkPromise.checkAsmrOne(rjCode).then(url => { if (rjCode === props.state.rjCode) asmrOneUrl.value = url; }),
-  ]);
-
-  try {
-    if (!props.state.display || rjCode !== props.state.rjCode) return;
-
-    // Tags
-    const newTags = [];
-    const typeText = await WorkPromise.getWorkTypeText(rjCode).catch(() => '');
-    if (typeText) newTags.push({ text: typeText, class: `voicelink-tag-orange` });
-
-    const rateAvg = await WorkPromise.getRateAvg(rjCode).catch(() => 0);
-    const rateCount = await WorkPromise.getRateCount(rjCode).catch(() => 0);
-    if (rateAvg > 0) newTags.push({ text: `${rateAvg.toFixed(2)}★ (${rateCount})`, class: `voicelink-tag-yellow` });
     
-    tags.value = newTags;
-
-    // Rows
-    const primaryOrder = ["circle_name", "voice_actor", "genre", "file_size"];
-    const secondaryOrder = ["dl_count", "release_date", "age_rating", "scenario", "illustration", "music"];
-    const order = [...primaryOrder, ...secondaryOrder];
-    
-    const rowPromises = order.map(async (id: string) => {
-      try {
-        if (id === 'circle_name') {
-            const val = await WorkPromise.getCircle(rjCode);
-            if (val) return { id, title: localizePopup(localizationMap.circle_name), items: [{ text: val }] };
-        } else if (id === 'dl_count') {
-            const val = await WorkPromise.getDLCount(rjCode);
-            if (val) return { id, title: localizePopup(localizationMap.dl_count), items: [{ text: val }] };
-        } else if (id === 'voice_actor') {
-            const vas = await WorkPromise.getCV(rjCode);
-            if (vas && vas.length) return { id, title: localizePopup(localizationMap.voice_actor), items: vas.map((v: string) => ({ text: v })), separator: ' / ' };
-        } else if (id === 'age_rating') {
-            const val = await WorkPromise.getAgeRating(rjCode);
-            if (val) return { id, title: localizePopup(localizationMap.age_rating), items: [{ text: val, class: val.includes('18') ? `voicelink-age-18` : `voicelink-age-all` }] };
-        } else if (id === 'file_size') {
-            const val = await WorkPromise.getFileSize(rjCode);
-            if (val) return { id, title: localizePopup(localizationMap.file_size), items: [{ text: val }] };
-        } else if (id === 'release_date') {
-            const val = await WorkPromise.getReleaseDate(rjCode);
-            if (val && val[0]) return { id, title: localizePopup(localizationMap.release_date), items: [{ text: val[0] }] };
-        } else if (id === 'scenario') {
-            const val = await WorkPromise.getScenario(rjCode);
-            if (val && val.length) return { id, title: localizePopup(localizationMap.scenario), items: val.map((v: string) => ({ text: v })), separator: ' / ' };
-        } else if (id === 'illustration') {
-            const val = await WorkPromise.getIllustrator(rjCode);
-            if (val && val.length) return { id, title: localizePopup(localizationMap.illustration), items: val.map((v: string) => ({ text: v })), separator: ' / ' };
-        } else if (id === 'genre') {
-            const val = await WorkPromise.getTags(rjCode);
-            if (val && val.length) return { id, title: localizePopup(localizationMap.genre), items: val.map((v: string) => ({ text: v })), separator: ' ' };
-        }
-      } catch(e) { }
-      return null;
-    });
-
-    const results = await Promise.all(rowPromises);
-    if (!props.state.display || rjCode !== props.state.rjCode) return;
-    
-    const validRows = results.filter(Boolean) as any[];
-    
-    const pRows = [];
-    for (const id of primaryOrder) {
-      const matched = validRows.find(r => r.id === id);
-      if (matched) pRows.push(matched);
-    }
-    primaryRows.value = pRows;
-
-    const sRows = [];
-    for (const id of secondaryOrder) {
-      const matched = validRows.find(r => r.id === id);
-      if (matched) sRows.push(matched);
-    }
-    secondaryRows.value = sRows;
-    
-  } catch (e) {
-    console.error(e);
-  } finally {
-    if (rjCode === props.state.rjCode) {
-      loading.value = false;
-    }
-  }
+    // Properties
+    WorkPromise.getWorkType(rjCode).then(v => { if (rjCode === props.state.rjCode) workTypeId.value = v; }),
+    WorkPromise.getWorkTypeText(rjCode).then(v => { if (rjCode === props.state.rjCode) workType.value = v; }),
+    WorkPromise.getRateAvg(rjCode).then(v => { if (rjCode === props.state.rjCode) ratingAvg.value = v; }),
+    WorkPromise.getRateCount(rjCode).then(v => { if (rjCode === props.state.rjCode) ratingCount.value = v; }),
+    WorkPromise.getDLCount(rjCode).then(v => { if (rjCode === props.state.rjCode && v) sales.value = String(v); }),
+    WorkPromise.getCircle(rjCode).then(v => { if (rjCode === props.state.rjCode && v) circle.value = v; }),
+    WorkPromise.getReleaseDate(rjCode).then(v => { if (rjCode === props.state.rjCode && v && v[0]) releaseDate.value = v[0]; }),
+    WorkPromise.getCV(rjCode).then(v => { if (rjCode === props.state.rjCode && v) cv.value = v; }),
+    WorkPromise.getAgeRating(rjCode).then(v => { if (rjCode === props.state.rjCode && v) ageRating.value = v; }),
+    WorkPromise.getFileSize(rjCode).then(v => { if (rjCode === props.state.rjCode && v) fileSize.value = v; }),
+    WorkPromise.getTags(rjCode).then(v => { if (rjCode === props.state.rjCode && v) genreTags.value = v; }),
+  ]).finally(() => {
+    if (rjCode === props.state.rjCode) loading.value = false;
+  });
 };
 
 watch(() => props.state.rjCode, (newVal) => {
@@ -307,7 +299,27 @@ watch(() => props.state.rjCode, (newVal) => {
 });
 
 watch(() => props.state.display, (newVal) => {
-  if (newVal) updatePopupData();
+  if (newVal) {
+    updatePopupData();
+    nextTick(() => {
+      if (innerWrapperRef.value) {
+        if (!resizeObserver) {
+          resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+              dynamicHeight.value = (entry.target as HTMLElement).offsetHeight + 32;
+            }
+          });
+        }
+        resizeObserver.observe(innerWrapperRef.value);
+      }
+    });
+  } else {
+    if (resizeObserver) {
+      resizeObserver.disconnect();
+      resizeObserver = null;
+    }
+    dynamicHeight.value = null;
+  }
 });
 </script>
 
@@ -324,13 +336,13 @@ watch(() => props.state.display, (newVal) => {
   font-size: 14px;
   color: #f1f5f9;
   
-  background-color: rgba(30, 41, 59, 0.85); /* Slate 800 */
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background-color: rgba(30, 30, 30, 0.85); /* Dark translucent background */
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
   
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 8px 10px rgba(0, 0, 0, 0.2);
   
   padding: 16px;
   box-sizing: border-box;
@@ -339,18 +351,22 @@ watch(() => props.state.display, (newVal) => {
   flex-direction: column;
   pointer-events: auto; /* Allow mouse interaction within the popup */
   user-select: text;    /* Allow text selection */
+  transition: height 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  overflow: hidden;
+}
+
+.popup-inner-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 .theme-maniax {
-  /* Subtle tint for Maniax */
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(59, 30, 52, 0.85) 100%);
-  border-top: 1px solid rgba(236, 72, 153, 0.3);
+  border-top: 2px solid rgba(236, 72, 153, 0.4);
 }
 
 .theme-girls {
-  /* Subtle tint for Girls */
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(59, 41, 30, 0.85) 100%);
-  border-top: 1px solid rgba(249, 115, 22, 0.3);
+  border-top: 2px solid rgba(249, 115, 22, 0.4);
 }
 
 .popup-close-btn {
@@ -383,30 +399,37 @@ watch(() => props.state.display, (newVal) => {
   gap: 12px;
 }
 
-.header-section {
+.popup-header {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-right: 24px;
 }
 
-.header-rjcode {
-  cursor: pointer;
-  border-bottom: 2px dashed rgba(244, 114, 182, 0.7);
-  background-color: rgba(244, 114, 182, 0.1);
-  border-radius: 4px;
-  padding: 2px 6px;
-  margin-right: 12px;
+.header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rj-eyebrow {
+  align-self: flex-start;
+  background-color: rgba(236, 72, 153, 0.15);
   color: rgb(244, 114, 182);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.95em;
+  font-weight: 700;
+  border: 1px solid rgba(236, 72, 153, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-weight: bold;
-  font-size: 1.1em;
-  transition: all 0.2s;
-  white-space: nowrap;
 }
 
-.header-rjcode:hover {
-  background-color: rgba(244, 114, 182, 0.2);
-  color: #fff;
+.rj-eyebrow:hover {
+  background-color: rgba(236, 72, 153, 0.25);
+  transform: scale(0.96);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .work-title {
@@ -432,6 +455,13 @@ watch(() => props.state.display, (newVal) => {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 86px; /* Space for 2 buttons to prevent reflow */
 }
 
 .dlsite-cover-container {
@@ -464,62 +494,164 @@ watch(() => props.state.display, (newVal) => {
   color: #93c5fd; /* Blue 300 */
 }
 
-.info-container {
-  margin-top: 8px;
+.circle-name-text {
+  font-size: 1.05em;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.5;
+  margin-top: 1px;
+}
+
+.tags-section {
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  width: 65px;
+  flex-shrink: 0;
+  font-size: 0.9em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0;
+  margin-top: 4px; /* Align with the first row of capsules */
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.tags-flow {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px; /* slightly tighter to compress height */
+}
+
+/* Skeleton Loader */
+.popup-skeleton {
   display: flex;
   flex-direction: column;
+  padding: 4px;
+}
+
+.skeleton-header {
+  margin-bottom: 16px;
+}
+
+.skeleton-eyebrow {
+  width: 80px;
+  height: 22px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.skeleton-title {
+  width: 90%;
+  height: 21px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.skeleton-title.short {
+  width: 60%;
+}
+
+.skeleton-panels {
+  display: flex;
+  flex: 1;
+  gap: 20px;
+}
+
+.skeleton-left {
+  flex: 0 0 240px;
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-cover {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.skeleton-btn {
+  width: 100%;
+  height: 38px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.skeleton-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skeleton-row {
+  display: flex;
+}
+
+.skeleton-label {
+  width: 60px;
+  height: 20px;
+  border-radius: 4px;
+  margin-top: 5px;
+  margin-right: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.skeleton-text {
+  width: 150px;
+  height: 20px;
+  border-radius: 4px;
+  margin-top: 5px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.skeleton-tags {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
-.secondary-info-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px 12px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px dashed rgba(255, 255, 255, 0.15);
+.skeleton-tag {
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
 }
 
-.secondary-info-grid :deep(.dlsite-plus-info-row) {
-  font-size: 0.95em;
-  margin-bottom: 0;
+.shimmer {
+  position: relative;
+  overflow: hidden;
 }
 
-.secondary-info-grid :deep(.dlsite-plus-info-title) {
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 600;
+.shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.05) 20%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.05) 80%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: sweep 1.5s infinite linear;
 }
 
-.secondary-info-grid :deep(.dlsite-plus-info-content) {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-/* Make scenario span 2 columns if it's long, but we'll let it be. If we really want, we can do it via nth-child but it's fine for now. */
-
-/* Loader */
-.popup-loader {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  width: 100%;
-}
-
-.dot {
-  width: 12px;
-  height: 12px;
-  margin: 0 6px;
-  background-color: #fff;
-  border-radius: 50%;
-  animation: pulse 1.2s infinite ease-in-out both;
-}
-
-.dot:nth-child(1) { animation-delay: -0.32s; }
-.dot:nth-child(2) { animation-delay: -0.16s; }
-
-@keyframes pulse {
-  0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
-  40% { transform: scale(1); opacity: 1; }
+@keyframes sweep {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(50%); }
 }
 
 /* Not Found */

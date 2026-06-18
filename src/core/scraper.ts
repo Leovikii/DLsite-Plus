@@ -415,32 +415,6 @@ export const WorkPromise = {
             throw new Error();
         },
 
-    getScenario: async function (rjCode) {
-            const p = WorkPromise.getWorkPromise(rjCode);
-            const api2 = await p.api2;
-            if (api2.creaters && api2.creaters.scenario_by && api2.creaters.scenario_by.length > 0) {
-                return api2.creaters.scenario_by.map(v => v.name);
-            }
-
-            //无法获取api2则直接通过html获取
-            const info = await WorkPromise.getWorkPromise(rjCode).info;
-            WorkPromise.checkNotNull(info.scenario);
-            return info.scenario;
-        },
-
-    getIllustrator: async function (rjCode) {
-            const p = WorkPromise.getWorkPromise(rjCode);
-            const api2 = await p.api2;
-            if (api2.creaters && api2.creaters.illust_by && api2.creaters.illust_by.length > 0) {
-                return api2.creaters.illust_by.map(v => v.name);
-            }
-
-            //无法获取api2则直接通过html获取
-            const info = await WorkPromise.getWorkPromise(rjCode).info;
-            WorkPromise.checkNotNull(info.illustration);
-            return info.illustration;
-        },
-
     getCV: async function (rjCode) {
             const p = WorkPromise.getWorkPromise(rjCode);
             const api2 = await p.api2;
