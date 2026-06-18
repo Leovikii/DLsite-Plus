@@ -21,12 +21,16 @@ export default defineConfig({
         match: [
           '*://*.south-plus.net/read.php*',
           '*://*.south-plus.net/thread.php*',
+          '*://*.south-plus.net/thread_new.php*',
           '*://*.spring-plus.net/read.php*',
           '*://*.spring-plus.net/thread.php*',
+          '*://*.spring-plus.net/thread_new.php*',
           '*://*.level-plus.net/read.php*',
           '*://*.level-plus.net/thread.php*',
+          '*://*.level-plus.net/thread_new.php*',
           '*://*.imoutolove.me/read.php*',
-          '*://*.imoutolove.me/thread.php*'
+          '*://*.imoutolove.me/thread.php*',
+          '*://*.imoutolove.me/thread_new.php*'
         ],
         version: '1.0.0',
         connect: [

@@ -180,12 +180,15 @@ const updatePopupData = async () => {
     if (!props.state.display || rjCode !== props.state.rjCode) return;
 
     // Tags
+    const newTags = [];
     const typeText = await WorkPromise.getWorkTypeText(rjCode).catch(() => '');
-    if (typeText) tags.value.push({ text: typeText, class: `voicelink-tag-orange` });
+    if (typeText) newTags.push({ text: typeText, class: `voicelink-tag-orange` });
 
     const rateAvg = await WorkPromise.getRateAvg(rjCode).catch(() => 0);
     const rateCount = await WorkPromise.getRateCount(rjCode).catch(() => 0);
-    if (rateAvg > 0) tags.value.push({ text: `${rateAvg.toFixed(2)}★ (${rateCount})`, class: `voicelink-tag-yellow` });
+    if (rateAvg > 0) newTags.push({ text: `${rateAvg.toFixed(2)}★ (${rateCount})`, class: `voicelink-tag-yellow` });
+    
+    tags.value = newTags;
 
     // Rows
     const order = [
