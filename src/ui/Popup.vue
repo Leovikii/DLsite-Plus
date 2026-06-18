@@ -3,7 +3,7 @@
     <div 
       v-if="state.display"
       ref="popupRef" 
-      class="rj-bridge-popup"
+      class="rj-warp-gate-popup"
       :class="[isGirls ? 'theme-girls' : 'theme-maniax']"
       :style="[positionStyle, dynamicHeight ? { height: dynamicHeight + 'px' } : {}]"
     >
@@ -324,7 +324,7 @@ watch(() => props.state.display, (newVal) => {
 </script>
 
 <style scoped>
-.rj-bridge-popup {
+.rj-warp-gate-popup {
   position: fixed;
   z-index: 2147483646;
   width: 650px;
@@ -701,7 +701,7 @@ watch(() => props.state.display, (newVal) => {
     width: 100%;
     margin-bottom: 16px;
   }
-  .rj-bridge-popup {
+  .rj-warp-gate-popup {
     width: 95vw;
     left: 2.5vw !important;
   }

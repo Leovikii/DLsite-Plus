@@ -64,9 +64,9 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.VERSION }}
-          name: RJ-Bridge ${{ env.VERSION }}
+          name: RJ-Warp-Gate ${{ env.VERSION }}
           body: |
             ### Changes
             ${{ env.CHANGELOG }}
-          files: dist/rj-bridge.user.js
+          files: dist/rj-warp-gate.user.js
           make_latest: true

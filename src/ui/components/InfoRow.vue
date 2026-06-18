@@ -1,23 +1,23 @@
 <template>
-  <div class="rj-bridge-info-row" v-if="items && items.length > 0">
+  <div class="rj-warp-gate-info-row" v-if="items && items.length > 0">
     <span 
-      class="rj-bridge-info-title" 
+      class="rj-warp-gate-info-title" 
       :title="copyHint"
       @click="onCopy(copyText || title, $event)"
     >
       {{ title }}
     </span>
-    <span class="rj-bridge-info-content">
+    <span class="rj-warp-gate-info-content">
       <template v-for="(item, index) in items" :key="index">
         <span 
           v-if="item.text" 
-          :class="['rj-bridge-info-item', item.class]" 
+          :class="['rj-warp-gate-info-item', item.class]" 
           :title="copyHint"
           @click="onCopy(item.text, $event)"
         >
           {{ item.text }}
         </span>
-        <span v-if="index < items.length - 1" class="rj-bridge-info-separator">{{ separator || ' ' }}</span>
+        <span v-if="index < items.length - 1" class="rj-warp-gate-info-separator">{{ separator || ' ' }}</span>
       </template>
     </span>
   </div>
@@ -49,7 +49,7 @@ const onCopy = (text: string, e: MouseEvent) => {
 </script>
 
 <style scoped>
-.rj-bridge-info-row {
+.rj-warp-gate-info-row {
   display: flex;
   align-items: flex-start;
   margin-bottom: 4px;
@@ -57,7 +57,7 @@ const onCopy = (text: string, e: MouseEvent) => {
   line-height: 1.4;
 }
 
-.rj-bridge-info-title {
+.rj-warp-gate-info-title {
   font-weight: 600;
   margin-right: 8px;
   color: rgba(255, 255, 255, 0.9);
@@ -66,31 +66,31 @@ const onCopy = (text: string, e: MouseEvent) => {
   transition: color 0.2s;
 }
 
-.rj-bridge-info-title::after {
+.rj-warp-gate-info-title::after {
   content: ":";
 }
 
-.rj-bridge-info-title:hover {
+.rj-warp-gate-info-title:hover {
   text-decoration: underline;
   color: #fff;
 }
 
-.rj-bridge-info-content {
+.rj-warp-gate-info-content {
   flex: 1;
   color: rgba(255, 255, 255, 0.8);
 }
 
-.rj-bridge-info-item {
+.rj-warp-gate-info-item {
   cursor: pointer;
   transition: color 0.2s;
 }
 
-.rj-bridge-info-item:hover {
+.rj-warp-gate-info-item:hover {
   text-decoration: underline;
   color: #fff;
 }
 
-.rj-bridge-info-separator {
+.rj-warp-gate-info-separator {
   color: rgba(255, 255, 255, 0.5);
   margin: 0 2px;
 }

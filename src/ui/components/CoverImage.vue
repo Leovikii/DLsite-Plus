@@ -1,5 +1,5 @@
 <template>
-  <div class="rj-bridge-img-container">
+  <div class="rj-warp-gate-img-container">
     <img 
       v-if="src" 
       :src="src" 
@@ -7,8 +7,8 @@
       @mouseleave="isHovered = false"
       :class="{ 'is-hovered': isHovered }"
     />
-    <div v-else class="rj-bridge-img-placeholder">
-      <div class="rj-bridge-img-skeleton"></div>
+    <div v-else class="rj-warp-gate-img-placeholder">
+      <div class="rj-warp-gate-img-skeleton"></div>
     </div>
   </div>
 </template>
@@ -24,7 +24,7 @@ const isHovered = ref(false);
 </script>
 
 <style scoped>
-.rj-bridge-img-container {
+.rj-warp-gate-img-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -36,7 +36,7 @@ const isHovered = ref(false);
   overflow: hidden;
 }
 
-.rj-bridge-img-container img {
+.rj-warp-gate-img-container img {
   max-width: 100%;
   max-height: 350px;
   object-fit: contain;
@@ -44,11 +44,11 @@ const isHovered = ref(false);
   transition: transform 0.3s ease;
 }
 
-.rj-bridge-img-container img.is-hovered {
+.rj-warp-gate-img-container img.is-hovered {
   transform: scale(1.05);
 }
 
-.rj-bridge-img-placeholder {
+.rj-warp-gate-img-placeholder {
   width: 100%;
   height: 100%;
   min-height: 200px;
@@ -57,7 +57,7 @@ const isHovered = ref(false);
   justify-content: center;
 }
 
-.rj-bridge-img-skeleton {
+.rj-warp-gate-img-skeleton {
   width: 50px;
   height: 50px;
   border-radius: 50%;

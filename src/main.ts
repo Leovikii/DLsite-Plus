@@ -12,7 +12,7 @@ export let observing = false;
 
 export function init() {
     if (document.location.hostname.endsWith("dlsite.com")) {
-        console.log("[RJ-Bridge] Disabled on DLSite to avoid layout conflicts.");
+        console.log("[RJ-Warp-Gate] Disabled on DLSite to avoid layout conflicts.");
         return;
     }
 

@@ -10,7 +10,7 @@ export const Parser = {
                 acceptNode: function (node: any) {
                     let el = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
                     while (el && el !== document.body) {
-                        if (el.classList?.contains('rj-bridge-popup') || el.classList?.contains(VOICELINK_IGNORED_CLASS)) {
+                        if (el.classList?.contains('rj-warp-gate-popup') || el.classList?.contains(VOICELINK_IGNORED_CLASS)) {
                             return NodeFilter.FILTER_REJECT;
                         }
                         el = el.parentElement;

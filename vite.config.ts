@@ -10,14 +10,20 @@ export default defineConfig({
     monkey({
       entry: 'src/main.ts',
       userscript: {
-        name: 'RJ-Bridge',
+        name: {
+          '': 'RJ Warp Gate',
+          'zh': 'RJ号折跃门',
+          'zh-CN': 'RJ号折跃门',
+          'zh-TW': 'RJ號折躍門'
+        },
         namespace: 'Leovikii',
         author: 'Leovikii',
         license: 'MIT',
         description: {
           '': 'Extract RJ codes on South Plus forums, automatically fetch and display DLSite work information, and provide ASMR ONE links.',
           'zh': '在南+论坛提取并高亮RJ号，自动获取并显示DLsite元数据，并提供ASMR ONE在线试听资源链接。',
-          'zh-CN': '在南+论坛提取并高亮RJ号，自动获取并显示DLsite元数据，并提供ASMR ONE在线试听资源链接。'
+          'zh-CN': '在南+论坛提取并高亮RJ号，自动获取并显示DLsite元数据，并提供ASMR ONE在线试听资源链接。',
+          'zh-TW': '在南+論壇提取並高亮RJ號，自動獲取並顯示DLsite元數據，並提供ASMR ONE在線試聽資源連結。'
         },
         match: [
           '*://*.south-plus.net/*',
