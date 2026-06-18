@@ -305,9 +305,11 @@ watch(() => props.state.display, (newVal) => {
       if (innerWrapperRef.value) {
         if (!resizeObserver) {
           resizeObserver = new ResizeObserver((entries) => {
-            for (const entry of entries) {
-              dynamicHeight.value = (entry.target as HTMLElement).offsetHeight + 32;
-            }
+            window.requestAnimationFrame(() => {
+              for (const entry of entries) {
+                dynamicHeight.value = (entry.target as HTMLElement).offsetHeight + 32;
+              }
+            });
           });
         }
         resizeObserver.observe(innerWrapperRef.value);

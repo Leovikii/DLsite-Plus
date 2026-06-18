@@ -487,7 +487,10 @@ export const WorkPromise = {
         },
 
     checkAsmrOne: async function (rjCode: string): Promise<string | null> {
-            return new Promise((resolve) => {
+            const p: any = WorkPromise.getWorkPromise(rjCode);
+            if (p._asmrone !== undefined) return p._asmrone;
+
+            p._asmrone = new Promise((resolve) => {
                 const rjNumber = rjCode.toUpperCase().replace('RJ', '');
                 const apiUrl = `https://api.asmr-200.com/api/work/${rjNumber}`;
                 
@@ -508,6 +511,7 @@ export const WorkPromise = {
                     }
                 });
             });
+            return p._asmrone;
         },
 
 

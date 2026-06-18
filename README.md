@@ -10,7 +10,7 @@
 
 ## 🌟 Features
 
-- **Hover Previews**: Hover over any RJ code on South Plus to instantly view a modern, glassmorphism popup containing DLsite metadata (Cover Image, Title, Tags, Voice Actors, Sales, etc.).
+- **Click Previews**: Click on any RJ code on South Plus to instantly view a modern, glassmorphism popup containing DLsite metadata (Cover Image, Title, Tags, Voice Actors, Sales, etc.).
 - **ASMR ONE Integration**: Provides one-click direct links to listen to ASMR works on ASMR ONE for free.
 - **Native Dark Mode**: Beautifully overrides South Plus styles to provide a highly customized, native dark mode experience that perfectly complements the glass popup UI.
 - **Auto-Localization**: Adapts to Simplified Chinese, Traditional Chinese, and English automatically.
