@@ -2,9 +2,9 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
-[🇨🇳 简体中文说明 (Simplified Chinese)](./README-zh.md) | [🇭🇰/🇹🇼 繁體中文說明 (Traditional Chinese)](./README-zh-TW.md)
+[🇨🇳 简体中文](./README-zh.md) | [🇭🇰/🇹🇼 繁體中文](./README-zh-TW.md)
 
-**RJ Warp Gate** is a powerful Tampermonkey script designed to connect South Plus forums, DLsite metadata, and ASMR ONE. It transforms static RJ codes into an interactive, beautifully designed experience.
+**RJ Warp Gate** is a powerful Tampermonkey script that bridges South Plus forums, DLsite, and ASMR ONE. It transforms static RJ codes into an interactive, beautifully designed experience and provides seamless cross-site resource searching.
 
 ![RJ Warp Gate Demo](./assets/demo.png)
 

@@ -26,7 +26,7 @@ export default defineConfig({
           'zh-TW': '為南+論壇和 DLsite 注入雙向資源檢索與高亮功能，提供詳盡的元數據預覽卡片及 ASMR ONE 在線試聽一鍵跳轉。'
         },
         homepageURL: 'https://sleazyfork.org/zh-CN/scripts/583340-rj-warp-gate',
-        supportURL: 'https://sleazyfork.org/zh-CN/scripts/583340-rj-warp-gate/feedback',
+        supportURL: 'https://github.com/Leovikii/RJ-Warp-Gate/issues',
         match: [
           '*://*.south-plus.net/*',
           '*://*.spring-plus.net/*',
