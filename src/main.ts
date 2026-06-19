@@ -18,7 +18,6 @@ export let observing = false;
 
 export function init() {
     if (document.location.hostname.includes("dlsite.com")) {
-        console.log("[RJ-Warp-Gate] Initializing DLSite integration...");
         initDLSiteInjector();
         return;
     }

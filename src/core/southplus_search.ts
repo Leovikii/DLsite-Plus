@@ -29,12 +29,10 @@ export async function searchSouthPlus(rjCode: string): Promise<SouthPlusSearchRe
 
   return new Promise((resolve) => {
     // 1. First GET to retrieve CSRF token and check if we are already in cooldown
-    console.log(`[RJ-Warp-Gate Debug] Fetching GET: ${SEARCH_URL_GET}`);
     GM_xmlhttpRequest({
       method: 'GET',
       url: SEARCH_URL_GET,
       onload: (res: any) => {
-        console.log(`[RJ-Warp-Gate Debug] GET responded with status: ${res.status}`);
         const html = res.responseText;
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
@@ -42,7 +40,6 @@ export async function searchSouthPlus(rjCode: string): Promise<SouthPlusSearchRe
         // Check if there is a cooldown or error message right away
         const errorText = doc.querySelector('.t .f_one b')?.textContent || '';
         if (errorText.includes('距离上次搜索时间') || errorText.includes('连续两次搜索')) {
-          console.log(`[RJ-Warp-Gate Debug] Hit cooldown during GET: ${errorText}`);
           return resolve({ success: false, results: [], isCooldown: true, errorMsg: errorText });
         }
 
@@ -51,7 +48,6 @@ export async function searchSouthPlus(rjCode: string): Promise<SouthPlusSearchRe
         const formData = new URLSearchParams();
         
         if (searchForm) {
-          console.log(`[RJ-Warp-Gate Debug] Found search form! Extracting all inputs...`);
           const elements = searchForm.querySelectorAll('input, select, textarea');
           elements.forEach(el => {
              const name = el.getAttribute('name');
@@ -77,8 +73,6 @@ export async function searchSouthPlus(rjCode: string): Promise<SouthPlusSearchRe
 
              if (!formData.has(name)) formData.append(name, (el as HTMLInputElement).value || '');
           });
-        } else {
-          console.warn(`[RJ-Warp-Gate Debug] Could not find the search form in the GET response.`);
         }
 
         // 2. Override specific parameters for our RJ search
@@ -90,8 +84,6 @@ export async function searchSouthPlus(rjCode: string): Promise<SouthPlusSearchRe
             formData.set('sch_time', 'all');
         }
         
-        console.log(`[RJ-Warp-Gate Debug] POSTing to ${SEARCH_URL_POST} with data: ${formData.toString()}`);
-
         GM_xmlhttpRequest({
           method: 'POST',
           url: SEARCH_URL_POST,
@@ -102,37 +94,17 @@ export async function searchSouthPlus(rjCode: string): Promise<SouthPlusSearchRe
             'Origin': `https://${domain}`
           },
           onload: (postRes: any) => {
-            console.log(`[RJ-Warp-Gate Debug] POST responded with status: ${postRes.status}`);
             const postHtml = postRes.responseText;
             const postDoc = parser.parseFromString(postHtml, 'text/html');
 
             // Check for cooldown or error again
             const postErrorText = postDoc.querySelector('.t .f_one b')?.textContent || '';
             if (postErrorText.includes('距离上次搜索时间') || postErrorText.includes('连续两次搜索') || postErrorText.includes('不能少于')) {
-              console.log(`[RJ-Warp-Gate Debug] Hit cooldown during POST: ${postErrorText}`);
               return resolve({ success: false, results: [], isCooldown: true, errorMsg: postErrorText });
             }
 
-            if (postHtml.includes('抱歉，没有找到匹配结果')) {
-              console.log(`[RJ-Warp-Gate Debug] Search successfully returned empty results.`);
+            if (postHtml.includes('抱歉，没有找到匹配结果') || postHtml.includes('没有查找匹配的内容')) {
               return resolve({ success: true, results: [] });
-            }
-
-            // Debug raw HTML features
-            const hasAjaxtable = postHtml.includes('ajaxtable');
-            const metaRefresh = postHtml.match(/<meta[^>]+refresh[^>]+url=([^"'>]+)/i);
-            const rawLinks = postHtml.match(/read\.php\?tid[^"'>\s]+/ig);
-            
-            // Clean up scripts to see the actual text
-            const docClone = postDoc.cloneNode(true) as Document;
-            docClone.querySelectorAll('script, style').forEach(el => el.remove());
-            const bodyText = docClone.body.textContent?.replace(/\s+/g, ' ').trim().substring(0, 500) || '';
-            
-            console.log(`[RJ-Warp-Gate Debug] HTML Analysis -> hasAjaxtable: ${hasAjaxtable}, metaRefresh: ${metaRefresh ? metaRefresh[1] : 'null'}, rawLinks count: ${rawLinks ? rawLinks.length : 0}`);
-            console.log(`[RJ-Warp-Gate Debug] PHPWind Clean Text: ${bodyText}`);
-            
-            if (rawLinks && rawLinks.length > 0) {
-              console.log(`[RJ-Warp-Gate Debug] Sample raw links:`, rawLinks.slice(0, 3));
             }
 
             // Parse results robustly
@@ -140,7 +112,7 @@ export async function searchSouthPlus(rjCode: string): Promise<SouthPlusSearchRe
             
             // South+ uses URL rewrites like read.php?tid-123.html or read.php?tid=123
             const aTags = Array.from(postDoc.querySelectorAll('a[href^="read.php?tid"]'));
-            console.log(`[RJ-Warp-Gate Debug] Found ${aTags.length} thread links using DOMParser.`);
+            
             
             aTags.forEach((aTag) => {
               const row = aTag.closest('tr');
@@ -197,38 +169,18 @@ export async function searchSouthPlus(rjCode: string): Promise<SouthPlusSearchRe
               date = date.replace(/[\r\n]+/g, ' ').trim();
 
               results.push({ title, url, author, date });
-              console.log(`[RJ-Warp-Gate Debug] Extracted Result #${results.length}: ${title} -> ${url}`);
             });
-
-            // FALLBACK: If DOM Parser failed but Regex found links, it means DOM is broken
-            if (results.length === 0 && rawLinks && rawLinks.length > 0) {
-                console.warn(`[RJ-Warp-Gate Debug] DOMParser failed to find links, but Regex found them! Using Regex fallback...`);
-                // Deduplicate raw links
-                const uniqueLinks = Array.from(new Set(rawLinks));
-                uniqueLinks.forEach(link => {
-                   results.push({
-                      title: "Found Resource (Parsing Failed)",
-                      url: `https://${domain}/${link}`,
-                      author: "Unknown",
-                      date: "Unknown"
-                   });
-                });
-            }
-
-            if (results.length === 0) {
-              console.warn(`[RJ-Warp-Gate Debug] Warning: Found 0 results. HTML Snippet: ${postHtml.substring(0, 500)}...`);
-            }
 
             resolve({ success: true, results });
           },
           onerror: (err: any) => {
-            console.error(`[RJ-Warp-Gate Debug] POST error:`, err);
+            console.error(`[RJ-Warp-Gate] POST error:`, err);
             resolve({ success: false, results: [], errorMsg: 'Network error during search POST.' });
           }
         });
       },
       onerror: (err: any) => {
-        console.error(`[RJ-Warp-Gate Debug] GET error:`, err);
+        console.error(`[RJ-Warp-Gate] GET error:`, err);
         resolve({ success: false, results: [], errorMsg: 'Network error during search GET.' });
       }
     });
